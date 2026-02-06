@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💝 Be My Valentine? 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe0f0 50%, #ffd4e5 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating hearts background */
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            animation: float 8s infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        .container.show {
+            opacity: 1;
+        }
+
+        .cat-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 40px;
+        }
+
+        .cat {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.1);
+            animation: none;
+        }
+
+        .cat.start-animation {
+            animation: growCat 5s ease-out forwards;
+        }
+
+        .cat video {
+            width: 400px;
+            height: auto;
+            /* Remove green screen background */
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        /* Chroma key green screen removal */
+        @supports (backdrop-filter: blur(1px)) {
+            .cat video {
+                /* This creates a chromakey effect for green screens */
+                mix-blend-mode: screen;
+            }
+        }
+
+        .cat {
+            background: transparent;
+        }
+
+        @keyframes growCat {
+            0% {
+                transform: translate(-50%, -50%) scale(0.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .speech-bubble {
+            position: absolute;
+            left: 50%;
+            top: -20px;
+            transform: translateX(-50%);
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(255, 105, 180, 0.3);
+            opacity: 0;
+            animation: none;
+            white-space: nowrap;
+            border: 3px solid #ff69b4;
+        }
+
+        .speech-bubble.start-animation {
+            animation: fadeInBubble 1s ease-out 5s forwards;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 15px solid #ff69b4;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 12px solid white;
+            z-index: 1;
+        }
+
+        @keyframes fadeInBubble {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .question {
+            font-size: 28px;
+            color: #ff1493;
+            font-weight: bold;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 30px;
+            opacity: 0;
+            animation: none;
+            position: relative;
+            min-height: 150px;
+            width: 100%;
+            max-width: 500px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .buttons-container.start-animation {
+            animation: fadeIn 1s ease-out 5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        button {
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #yesBtn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 20, 147, 0.4);
+        }
+
+        #noBtn {
+            background: linear-gradient(135deg, #ddd, #bbb);
+            color: #666;
+            position: absolute;
+            left: 280px;
+        }
+
+        #noBtn:hover {
+            transform: scale(1.05);
+        }
+
+        .celebration {
+            display: none;
+            text-align: center;
+            animation: bounceIn 0.6s;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .celebration h1 {
+            font-size: 60px;
+            color: #ff1493;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3);
+        }
+
+        .celebration-cat {
+            font-size: 150px;
+            animation: dance 0.5s infinite;
+        }
+
+        @keyframes dance {
+            0%, 100% {
+                transform: rotate(-5deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .celebration p {
+            font-size: 30px;
+            color: #ff69b4;
+            margin-top: 20px;
+        }
+
+        /* Minecraft Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .minecraft-logo {
+            font-size: 48px;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            text-shadow: 4px 4px 0px #3f3f3f;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+        }
+
+        .loading-bar-container {
+            width: 400px;
+            height: 30px;
+            background: #3f3f3f;
+            border: 4px solid #1a1a1a;
+            box-shadow: 0 0 0 2px #8b8b8b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(to bottom, #4a9eff 0%, #2d5f99 100%);
+            width: 0%;
+            animation: loadProgress 5s ease-out forwards;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.3);
+        }
+
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Confetti styles */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Minecraft Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="minecraft-logo">💝 VALENTINE'S DAY 💝</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+        <div class="loading-text">
+            Loading<span class="loading-dots"></span>
+        </div>
+    </div>
+
+    <div class="hearts" id="hearts"></div>
+    
+    <!-- Background music for first 5 seconds -->
+    <audio id="bgMusic">
+        <source src="assets/YAYSound.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Confetti sound effect -->
+    <audio id="confettiSound">
+        <source src="assets/oiiaSound.mp3" type="audio/mpeg">
+    </audio>
+
+        <!-- Running Sound -->
+    <audio id="postLoadSound">
+        <source src="assets/after-loading-sound.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div class="container">
+        <div id="questionSection">
+            <div class="cat-container">
+                <div class="cat">
+                    <video id="catVideo" muted playsinline>
+                        <source src="assets/catRunningVideo.mp4" type="video/mp4">
+                        <!-- Fallback emoji if video doesn't load -->
+                        🐱
+                    </video>
+                </div>
+                <div class="speech-bubble">
+                    <div class="question">Will you be my Valentine? 💕</div>
+                </div>
+            </div>
+            
+            <div class="buttons-container">
+                <button id="yesBtn">Yes! 💖</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
+
+        <div class="celebration" id="celebration">
+            <video id="successVideo" muted playsinline style="max-width: 100%; height: auto;">
+                <source src="assets/catYes.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // Loading screen control
+        const loadingScreen = document.getElementById('loadingScreen');
+        const container = document.querySelector('.container');
+        const catElement = document.querySelector('.cat');
+        const speechBubble = document.querySelector('.speech-bubble');
+        const buttonsContainer = document.querySelector('.buttons-container');
+        
+        // Fade out loading screen after 5 seconds
+        setTimeout(() => {
+            loadingScreen.classList.add('fade-out');
+            // Remove from DOM and start main animations after fade
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                container.classList.add('show');
+                
+                // Start cat grow animation
+                catElement.classList.add('start-animation');
+                
+                // Start speech bubble animation
+                speechBubble.classList.add('start-animation');
+                
+                // Start buttons animation
+                buttonsContainer.classList.add('start-animation');
+                
+                // Start background music
+                playMusic();
+
+                // 🔊 Play post-load sound for 5 seconds
+                const postLoadSound = document.getElementById('postLoadSound');
+
+                postLoadSound.currentTime = 0;
+                postLoadSound.play().catch(err =>
+                    console.log('Post-load sound blocked:', err)
+                );
+
+                // Stop after 5 seconds
+                setTimeout(() => {
+                    postLoadSound.pause();
+                    postLoadSound.currentTime = 0;
+                }, 5000);
+                                
+                // Start cat video
+                const catVideo = document.getElementById('catVideo');
+                catVideo.play();
+                
+                // Stop video after 5 seconds
+                setTimeout(() => {
+                    catVideo.pause();
+                }, 5000);
+            }, 500);
+        }, 5000);
+
+        // Background music control
+        const bgMusic = document.getElementById('bgMusic');
+        
+        // Play background music with error handling
+        const playMusic = () => {
+            bgMusic.play().catch(err => {
+                console.log('Audio autoplay prevented, will play on user interaction');
+                // If autoplay is blocked, play on first user interaction
+                document.body.addEventListener('click', () => {
+                    bgMusic.play().catch(e => console.log('Could not play audio:', e));
+                }, { once: true });
+            });
+        };
+        
+        // Stop music after 5 seconds
+        setTimeout(() => {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+        }, 5000);
+        
+        // Green screen removal function
+        const catVideo = document.getElementById('catVideo');
+        
+        // Create canvas for green screen removal
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        catVideo.addEventListener('loadedmetadata', function() {
+            canvas.width = catVideo.videoWidth;
+            canvas.height = catVideo.videoHeight;
+            
+            // Replace video with canvas
+            const canvasElement = document.createElement('canvas');
+            canvasElement.width = canvas.width;
+            canvasElement.height = canvas.height;
+            canvasElement.style.width = '400px';
+            canvasElement.style.height = 'auto';
+            
+            const canvasCtx = canvasElement.getContext('2d');
+            catVideo.parentNode.appendChild(canvasElement);
+            
+            function processFrame() {
+                if (catVideo.paused || catVideo.ended) return;
+                
+                ctx.drawImage(catVideo, 0, 0, canvas.width, canvas.height);
+                const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = frame.data;
+                
+                // Remove green screen (adjust these values based on your green screen)
+                for (let i = 0; i < data.length; i += 4) {
+                    const red = data[i];
+                    const green = data[i + 1];
+                    const blue = data[i + 2];
+                    
+                    // Detect green color and make it transparent
+                    if (green > 100 && green > red * 1.5 && green > blue * 1.5) {
+                        data[i + 3] = 0; // Make pixel transparent
+                    }
+                }
+                
+                canvasCtx.putImageData(frame, 0, 0);
+                requestAnimationFrame(processFrame);
+            }
+            
+            catVideo.style.display = 'none';
+            
+            // Start processing when video plays
+            catVideo.addEventListener('play', processFrame, { once: true });
+        });
+
+        // Create floating hearts
+        const heartsContainer = document.getElementById('hearts');
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = '💕';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 8 + 's';
+            heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            heartsContainer.appendChild(heart);
+        }
+
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const questionSection = document.getElementById('questionSection');
+        const celebration = document.getElementById('celebration');
+
+        // Track how many times No is hovered
+        let noHoverCount = 0;
+        const baseScale = 1;
+        const scaleIncrement = 0.2;
+
+        // Move "No" button on hover and grow "Yes" button
+        noBtn.addEventListener('mouseenter', function() {
+            // Increment hover count and grow Yes button
+            noHoverCount++;
+            const newScale = baseScale + (scaleIncrement * noHoverCount);
+            yesBtn.style.transform = `scale(${newScale})`;
+            
+            const container = document.querySelector('.buttons-container');
+            const containerRect = container.getBoundingClientRect();
+            
+            // Get random position within a reasonable range
+            const maxX = window.innerWidth - noBtn.offsetWidth - 40;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 40;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        });
+
+        // "Yes" button click
+        yesBtn.addEventListener('click', function() {
+            // Play confetti sound
+
+            // Play oiia sound 1 second after clicking Yes
+            const confettiSound = document.getElementById('confettiSound');
+
+            setTimeout(() => {
+            confettiSound.currentTime = 0;
+            confettiSound.play().catch(err =>
+                console.log('Could not play oiia sound:', err)
+            );
+            }, 1000);
+                        
+            
+            // Shoot confetti
+            shootConfetti();
+            
+            // Wait a moment before transitioning to success video
+            setTimeout(() => {
+                questionSection.style.display = 'none';
+                celebration.style.display = 'block';
+                
+                // Setup success video with green screen removal
+                const successVideo = document.getElementById('successVideo');
+                
+                // Wait for video to be ready before processing
+                if (successVideo.readyState >= 2) {
+                    setupSuccessVideo();
+                } else {
+                    successVideo.addEventListener('loadeddata', setupSuccessVideo, { once: true });
+                }
+                
+                function setupSuccessVideo() {
+                    const successCanvas = document.createElement('canvas');
+                    const successCtx = successCanvas.getContext('2d');
+                    
+                    successCanvas.width = successVideo.videoWidth;
+                    successCanvas.height = successVideo.videoHeight;
+                    
+                    const canvasElement = document.createElement('canvas');
+                    canvasElement.width = successCanvas.width;
+                    canvasElement.height = successCanvas.height;
+                    canvasElement.style.maxWidth = '100%';
+                    canvasElement.style.height = 'auto';
+                    
+                    const canvasCtx = canvasElement.getContext('2d');
+                    successVideo.parentNode.appendChild(canvasElement);
+                    
+                    function processSuccessFrame() {
+                        if (successVideo.paused || successVideo.ended) return;
+                        
+                        try {
+                            successCtx.drawImage(successVideo, 0, 0, successCanvas.width, successCanvas.height);
+                            const frame = successCtx.getImageData(0, 0, successCanvas.width, successCanvas.height);
+                            const data = frame.data;
+                            
+                            // Remove green screen
+                            for (let i = 0; i < data.length; i += 4) {
+                                const red = data[i];
+                                const green = data[i + 1];
+                                const blue = data[i + 2];
+                                
+                                if (green > 100 && green > red * 1.5 && green > blue * 1.5) {
+                                    data[i + 3] = 0;
+                                }
+                            }
+                            
+                            canvasCtx.putImageData(frame, 0, 0);
+                        } catch (err) {
+                            console.error('Error processing frame:', err);
+                        }
+                        
+                        requestAnimationFrame(processSuccessFrame);
+                    }
+                    
+                    successVideo.style.display = 'none';
+                    successVideo.play().then(() => {
+                        processSuccessFrame();
+                    }).catch(err => console.error('Error playing success video:', err));
+                }
+            }, 1000); // Wait 1 second to show confetti before transitioning
+        });
+
+        // Confetti shooting function
+        function shootConfetti() {
+            const colors = ['#ff69b4', '#ff1493', '#ffc0cb', '#ff85c1', '#ff1493', '#9d4edd', '#ffff00', '#00ff00', '#00bfff', '#ff6347'];
+            const confettiCount = 150;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.opacity = Math.random();
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 4000);
+                }, i * 10);
+            }
+        }
+    </script>
+</body>
+</html>
