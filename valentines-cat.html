@@ -388,19 +388,34 @@
 
     <div class="hearts" id="hearts"></div>
     
-    <!-- Background music for first 5 seconds -->
-    <audio id="bgMusic">
-        <source src="assets/YAYSound.mp3" type="audio/mpeg">
+    <!-- Welcome song that plays on page load -->
+    <audio id="welcomeSong" loop>
+        <source src="assets/pizza.mp3" type="audio/mpeg">
     </audio>
     
-    <!-- Confetti sound effect -->
-    <audio id="confettiSound">
+    <!-- Background music for first 5 seconds -->
+    <audio id="bgMusic">
+        <source src="assets/panting2.wav" type="audio/mpeg">
+    </audio>
+    
+    <!-- oiia sound effect -->
+    <audio id="oiiaSound">
         <source src="assets/oiiaSound.mp3" type="audio/mpeg">
+    </audio>
+
+        <!-- YAY sound effect -->
+    <audio id="YAYSound">
+        <source src="assets/YAYSound.mp3" type="audio/mpeg">
     </audio>
 
         <!-- Running Sound -->
     <audio id="postLoadSound">
         <source src="assets/after-loading-sound.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- No button hover sound effect -->
+    <audio id="hoverSound">
+        <source src="assets/hover-sound.mp3" type="audio/mpeg">
     </audio>
     
     <div class="container">
@@ -432,6 +447,18 @@
     </div>
 
     <script>
+        // Play welcome song immediately on page load
+        const welcomeSong = document.getElementById('welcomeSong');
+        
+        // Attempt to play welcome song immediately
+        welcomeSong.play().catch(err => {
+            console.log('Autoplay prevented, will play on first user interaction');
+            // If autoplay is blocked, play on first user interaction
+            document.body.addEventListener('click', () => {
+                welcomeSong.play().catch(e => console.log('Could not play welcome song:', e));
+            }, { once: true });
+        });
+        
         // Loading screen control
         const loadingScreen = document.getElementById('loadingScreen');
         const container = document.querySelector('.container');
@@ -442,6 +469,11 @@
         // Fade out loading screen after 5 seconds
         setTimeout(() => {
             loadingScreen.classList.add('fade-out');
+            
+            // Stop welcome song when loading ends
+            welcomeSong.pause();
+            welcomeSong.currentTime = 0;
+            
             // Remove from DOM and start main animations after fade
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
@@ -578,6 +610,13 @@
 
         // Move "No" button on hover and grow "Yes" button
         noBtn.addEventListener('mouseenter', function() {
+            // Play hover sound effect
+            const hoverSound = document.getElementById('hoverSound');
+            hoverSound.currentTime = 0; // Reset to start
+            hoverSound.play().catch(err => {
+                console.log('Could not play hover sound:', err);
+            });
+            
             // Increment hover count and grow Yes button
             noHoverCount++;
             const newScale = baseScale + (scaleIncrement * noHoverCount);
@@ -603,14 +642,23 @@
             // Play confetti sound
 
             // Play oiia sound 1 second after clicking Yes
-            const confettiSound = document.getElementById('confettiSound');
+            const oiiaSound = document.getElementById('oiiaSound');
+            const YAYSound = document.getElementById('YAYSound');
 
             setTimeout(() => {
-            confettiSound.currentTime = 0;
-            confettiSound.play().catch(err =>
+            oiiaSound.currentTime = 0;
+            YAYSound.currentTime = 0;
+            oiiaSound.play().catch(err =>
                 console.log('Could not play oiia sound:', err)
             );
+            YAYSound.play().catch(err =>
+                console.log('Could not play YAY sound:', err)
+            );            
             }, 1000);
+
+            
+
+                        
                         
             
             // Shoot confetti
